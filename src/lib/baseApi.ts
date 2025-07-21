@@ -3,18 +3,12 @@ import Cookies from 'js-cookie';
 
 // Cấu hình các môi trường và API URL tương ứng.
 const apiUrls: { [key: string]: string } = {
-  f168: 'https://api-quatangv2-f168.attcloud.work/api',
-  new88: 'https://api-quatangv2-new88.attcloud.work/api',
-  shbet: 'https://api-quatangv2-shbet.attcloud.work/api',
+  mb66: 'http://localhost:9000/api/v1'
 };
 
 // Map từ hostname của trang admin sang key của hệ thống
 export const siteMapping: { [key: string]: string } = {
-  'f168msb.attcloud.org': 'f168',
-  'new88msb.attcloud.org': 'new88',
-  'shbetmsb.attcloud.org': 'shbet',
-  // Thêm 'localhost' để phát triển ở local
-  'localhost': 'new88' // Mặc định là new88 khi chạy local, bạn có thể đổi
+  'localhost': 'mb66' // Mặc định là new88 khi chạy local, bạn có thể đổi
 };
 
 
@@ -40,7 +34,7 @@ baseApi.interceptors.request.use((config) => {
     }
   }
   
-  const token = Cookies.get("token");
+  const token = Cookies.get("mb66botchitieu_token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -53,7 +47,7 @@ baseApi.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && [401, 403].includes(error.response.status)) {
-      Cookies.remove("token");
+      Cookies.remove("mb66botchitieu_token");
       // Chuyển hướng người dùng về trang đăng nhập
       // Đảm bảo rằng bạn đang ở môi trường client-side trước khi dùng window
       if (typeof window !== "undefined") {

@@ -17,7 +17,7 @@ export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const router = useRouter();
-  const [form, setForm] = useState({ username: '', password: '' });
+  const [form, setForm] = useState({ username: 'admin', password: '@Matkhau88' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { refreshUser } = useAuth();
@@ -38,10 +38,9 @@ export default function SignInForm() {
 
     try {
       const res = await authServices.login(form);
-      Cookies.set("token", res.data, { expires: 1, path: '/' });
+      Cookies.set("mb66botchitieu_token", res.data.access_token, { expires: 1, path: '/' });
       refreshUser();
-
-      if (res.status_code == 200 && res.data) {
+      if (res.success == true && res.data) {
         setTimeout(() => {
           router.push("/admin");
         }, 500);
@@ -108,20 +107,7 @@ export default function SignInForm() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Checkbox checked={isChecked} onChange={setIsChecked} />
-                    <span className="block font-normal text-gray-700 text-theme-sm dark:text-gray-400">
-                      Keep me logged in
-                    </span>
-                  </div>
-                  <Link
-                    href="/reset-password"
-                    className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
+                
                 <div>
                   <Button className="w-full" size="sm" type="submit">
                     {loading ? 'Loading...' : 'Sign in'}
@@ -129,18 +115,6 @@ export default function SignInForm() {
                 </div>
               </div>
             </form>
-
-            <div className="mt-5">
-              <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
-                Chưa có tài khoản vui lòng liên hệ ? {""}
-                <Link
-                  href="/signup"
-                  className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
-                >
-                  Admin
-                </Link>
-              </p>
-            </div>
           </div>
         </div>
       </div>

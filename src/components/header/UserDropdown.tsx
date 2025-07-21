@@ -39,9 +39,15 @@ const UserDropdown = () => {
           />
         </span>
 
-        <span className="block mr-1 font-medium text-theme-sm">
-          {user?.username ?? ""} | ({user?.role ?? ""})
-        </span>
+        {/* Hiển thị thông tin user chuyên nghiệp hơn */}
+        <div className="flex flex-col items-start mr-1">
+          <span className="font-semibold text-base text-gray-900 dark:text-white truncate max-w-[120px]">
+            {user?.username || "Người dùng"}
+          </span>
+          <span className="text-xs text-gray-500 mt-0.5 capitalize">
+            {user?.role ? `Vai trò: ${user.role}` : "Chưa xác định"}
+          </span>
+        </div>
 
         <svg
           className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""

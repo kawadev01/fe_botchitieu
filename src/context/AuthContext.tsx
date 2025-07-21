@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const loadUser = () => {
     setIsLoading(true);
     const decoded = getDecodedToken();
-
+    console.log(decoded);
     if (decoded) {
       const userData: User = {
         id: (decoded as any).id,

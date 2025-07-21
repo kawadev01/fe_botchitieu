@@ -8,7 +8,7 @@ export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    const token = Cookies.get("token");
+    const token = Cookies.get("mb66botchitieu_token");
     if (token) {
       router.replace("/admin");
     } else {

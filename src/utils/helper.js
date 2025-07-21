@@ -15,9 +15,8 @@ import Cookies from "js-cookie";
  * @returns {DecodedToken|null}
  */
 function getDecodedToken() {
-  const token = Cookies.get("token");
+  const token = Cookies.get("mb66botchitieu_token");
   if (!token) return null;
-
   try {
     return jwtDecode(token);
   } catch (err) {
@@ -27,7 +26,7 @@ function getDecodedToken() {
 }
 
 function logoutHelper() {
-  Cookies.remove("token");
+  Cookies.remove("mb66botchitieu_token");
 }
 
 export { getDecodedToken, logoutHelper };

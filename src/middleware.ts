@@ -14,7 +14,7 @@ const roleAccess: Record<string, string[]> = {
 };
 
 export function middleware(request: NextRequest) {
-    const token = request.cookies.get("token")?.value;
+    const token = request.cookies.get("mb66botchitieu_token")?.value;
     const { pathname } = request.nextUrl;
 
     const publicPaths = ["/login", "/register", "/api", "/favicon.ico", "/_next", "/static"];
