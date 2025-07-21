@@ -12,12 +12,21 @@ import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
+import Switch from "../form/switch/Switch";
 import { EyeCloseIcon, EyeIcon } from "@/icons";
 import userServices from '@/services/userServices';
 import { getSiteSystem } from "@/utils/storage";
 import { information } from '@/utils/info.const';
 import { formatDateTimeVN } from "@/utils/formatDateTime";
 import Pagination from "@/layout/Pagination";
+import { 
+    UserStatus, 
+    UserRole, 
+    User, 
+    getStatusLabel, 
+    isActiveStatus, 
+    toggleStatus 
+} from "@/types/user";
 
 // Initial form state for adding/editing users
 const initialForm = {
@@ -25,51 +34,54 @@ const initialForm = {
     password: '',
     oldPassword: '',
     role: 'user', // Default role for new user
-    status: true,
+    status: UserStatus.ACTIVE, // Default status for new user
     site: getSiteSystem(),
 };
 
-// User data type based on API response
-type UserType = {
-    _id: string;
-    username: string;
-    site: string;
-    role: string;
-    status: boolean;
-    createdAt: string;
-    updatedAt: string;
-};
+// User data type based on API response (use the imported User type)
+type UserType = User;
 
-// Skeleton loader component
+// Enhanced Skeleton loader component
 const TableSkeleton = () => (
     <>
-        {[...Array(5)].map((_, index) => (
-            <TableRow key={index}>
-                <TableCell className="px-5 py-4">
-                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+        {[...Array(8)].map((_, index) => (
+            <TableRow key={index} className="animate-pulse">
+                <TableCell className="px-6 py-4">
+                    <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded-md animate-shimmer"></div>
                 </TableCell>
-                <TableCell className="px-4 py-3">
-                    <div className="h-4 bg-gray-200 rounded animate-pulse w-24"></div>
+                <TableCell className="px-6 py-4">
+                    <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full animate-shimmer"></div>
+                        <div className="space-y-2">
+                            <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded animate-shimmer w-24"></div>
+                            <div className="h-3 bg-gradient-to-r from-gray-200 to-gray-300 rounded animate-shimmer w-16"></div>
+                        </div>
+                    </div>
                 </TableCell>
-                <TableCell className="px-4 py-3">
-                    <div className="h-4 bg-gray-200 rounded animate-pulse w-16"></div>
+                <TableCell className="px-6 py-4">
+                    <div className="h-8 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg animate-shimmer w-28"></div>
                 </TableCell>
-                <TableCell className="px-4 py-3">
-                    <div className="h-8 bg-gray-200 rounded animate-pulse w-20"></div>
+                <TableCell className="px-6 py-4">
+                    <div className="flex justify-center">
+                        <div className="h-6 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full animate-shimmer w-16"></div>
+                    </div>
                 </TableCell>
-                <TableCell className="px-4 py-3">
-                    <div className="h-6 bg-gray-200 rounded-full animate-pulse w-16 mx-auto"></div>
+                <TableCell className="px-6 py-4">
+                    <div className="space-y-1">
+                        <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded animate-shimmer w-20"></div>
+                        <div className="h-3 bg-gradient-to-r from-gray-200 to-gray-300 rounded animate-shimmer w-16"></div>
+                    </div>
                 </TableCell>
-                <TableCell className="px-4 py-3">
-                    <div className="h-4 bg-gray-200 rounded animate-pulse w-20"></div>
+                <TableCell className="px-6 py-4">
+                    <div className="space-y-1">
+                        <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded animate-shimmer w-20"></div>
+                        <div className="h-3 bg-gradient-to-r from-gray-200 to-gray-300 rounded animate-shimmer w-16"></div>
+                    </div>
                 </TableCell>
-                <TableCell className="px-4 py-3">
-                    <div className="h-4 bg-gray-200 rounded animate-pulse w-20"></div>
-                </TableCell>
-                <TableCell className="px-4 py-3">
+                <TableCell className="px-6 py-4">
                     <div className="flex justify-center gap-2">
-                        <div className="h-8 bg-gray-200 rounded animate-pulse w-20"></div>
-                        <div className="h-8 bg-gray-200 rounded animate-pulse w-16"></div>
+                        <div className="h-8 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg animate-shimmer w-20"></div>
+                        <div className="h-8 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg animate-shimmer w-16"></div>
                     </div>
                 </TableCell>
             </TableRow>
@@ -77,33 +89,47 @@ const TableSkeleton = () => (
     </>
 );
 
-// Status Badge Component
-const StatusBadge = ({ status, onClick, loading }: { status: boolean; onClick: () => void; loading?: boolean }) => (
-    <div className="flex flex-col items-center gap-2">
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            status 
-                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' 
-                : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
-        }`}>
-            <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${status ? 'bg-green-400' : 'bg-red-400'}`}></div>
-            {status ? "Hoạt động" : "Tạm ngừng"}
-        </span>
-        <button
-            onClick={onClick}
-            disabled={loading}
-            type="button"
-            className={`text-xs font-medium rounded-md px-3 py-1.5 transition-colors duration-200 ${
-                status 
-                    ? 'text-yellow-700 bg-yellow-50 hover:bg-yellow-100 dark:bg-yellow-900/20 dark:text-yellow-400 dark:hover:bg-yellow-900/30' 
-                    : 'text-green-700 bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/30'
-            } ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-sm'}`}
-        >
-            {loading ? '...' : (status ? "Vô hiệu hóa" : "Kích hoạt")}
-        </button>
-    </div>
-);
+// Enhanced Status Badge Component
+const StatusBadge = ({ status, isLoading = false }: { status: string; isLoading?: boolean }) => {
+    const isActive = isActiveStatus(status);
+    return (
+        <div className="flex items-center justify-center">
+            <span className={`
+                inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200
+                ${isActive 
+                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800' 
+                    : 'bg-red-100 text-red-800 border border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800'
+                }
+                ${isLoading ? 'opacity-50' : ''}
+            `}>
+                <div className={`w-2 h-2 rounded-full mr-2 ${isActive ? 'bg-emerald-500' : 'bg-red-500'} ${isLoading ? 'animate-pulse' : ''}`}></div>
+                {getStatusLabel(status)}
+            </span>
+        </div>
+    );
+};
 
-// Action Buttons Component
+// Enhanced Role Badge Component
+const RoleBadge = ({ role }: { role: string }) => {
+    const getRoleColor = (role: string) => {
+        switch (role) {
+            case 'superadmin':
+                return 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800';
+            case 'admin':
+                return 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800';
+            default:
+                return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-400 dark:border-gray-800';
+        }
+    };
+
+    return (
+        <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200 ${getRoleColor(role)}`}>
+            {information.role[role as keyof typeof information.role]}
+        </span>
+    );
+};
+
+// Enhanced Action Buttons Component
 const ActionButtons = ({ onChangePassword, onDelete, loading }: { 
     onChangePassword: () => void; 
     onDelete: () => void; 
@@ -113,20 +139,21 @@ const ActionButtons = ({ onChangePassword, onDelete, loading }: {
         <button
             onClick={onChangePassword}
             disabled={loading}
-            className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 hover:border-blue-300 transition-colors duration-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800 dark:hover:bg-blue-900/30"
+            className="group inline-flex items-center px-3 py-2 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:border-blue-300 hover:shadow-md transition-all duration-200 transform hover:scale-105 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800 dark:hover:bg-blue-900/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
         >
-            <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2ZM8 7C8 5.89543 8.89543 5 10 5C11.1046 5 12 5.89543 12 7C12 8.10457 11.1046 9 10 9C8.89543 9 8 8.10457 8 7ZM10 11C7.79086 11 6 12.7909 6 15H14C14 12.7909 12.2091 11 10 11Z" clipRule="evenodd"/>
+            <svg className="w-3.5 h-3.5 mr-1.5 group-hover:rotate-12 transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-2a1 1 0 11-2 0 1 1 0 012 0z" clipRule="evenodd"/>
             </svg>
             Đổi MK
         </button>
         <button
             onClick={onDelete}
             disabled={loading}
-            className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-md hover:bg-red-100 hover:border-red-300 transition-colors duration-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/30"
+            className="group inline-flex items-center px-3 py-2 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 hover:shadow-md transition-all duration-200 transform hover:scale-105 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
         >
-            <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8.707 7.293C8.31648 6.90248 7.68352 6.90248 7.29289 7.29289C6.90237 7.68342 6.90237 8.31658 7.29289 8.70711L8.58579 10L7.29289 11.2929C6.90237 11.6834 6.90237 12.3166 7.29289 12.7071C7.68352 13.0975 8.31648 13.0975 8.707 12.7071L10 11.4142L11.293 12.7071C11.6835 13.0975 12.3165 13.0975 12.7071 12.7071C13.0976 12.3166 13.0976 11.6834 12.7071 11.2929L11.4142 10L12.7071 8.70711C13.0976 8.31658 13.0976 7.68342 12.7071 7.29289C12.3165 6.90248 11.6835 6.90248 11.293 7.29289L10 8.58579L8.707 7.293Z" clipRule="evenodd"/>
+            <svg className="w-3.5 h-3.5 mr-1.5 group-hover:rotate-12 transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clipRule="evenodd"/>
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
             </svg>
             Xóa
         </button>
@@ -243,23 +270,72 @@ export default function UserTable() {
         }
     };
 
+    // Handle status change specifically
+    const handleStatusChange = async (userId: string, newStatus: string) => {
+        const user = data.find(u => u._id === userId);
+        if (!user) return;
+
+        // Don't make API call if status is the same
+        if (user.status === newStatus) return;
+
+        await handleUpdateUser(userId, { status: newStatus });
+    };
+
+    // Handle role change specifically  
+    const handleRoleChange = async (userId: string, newRole: string) => {
+        const user = data.find(u => u._id === userId);
+        if (!user) return;
+
+        // Don't make API call if role is the same
+        if (user.role === newRole) return;
+
+        await handleUpdateUser(userId, { role: newRole });
+    };
+
     // Generic function to update user details (role, status)
-    const handleUpdateUser = async (userId: string, updateData: { role?: string; status?: boolean }) => {
+    const handleUpdateUser = async (userId: string, updateData: { role?: string; status?: string }) => {
         setUpdateLoading(userId);
+        
+        // Get current user data for rollback if needed
+        const currentUser = data.find(user => user._id === userId);
+        if (!currentUser) return;
+
+        // Optimistic update - update UI immediately
+        setData(prevData =>
+            prevData.map(user => 
+                user._id === userId 
+                    ? { ...user, ...updateData } 
+                    : user
+            )
+        );
+
         try {
             const res = await userServices.updateUser(userId, updateData);
             if (res.success) {
-                toast.success("Cập nhật người dùng thành công!");
+                // Update with server response data
                 setData(prevData =>
                     prevData.map(user => (user._id === userId ? res.data : user))
                 );
+                
+                // Show success message based on update type
+                const updateType = updateData.status !== undefined ? 'trạng thái' : 'vai trò';
+                toast.success(`Cập nhật ${updateType} thành công!`);
             } else {
+                // Rollback to original state on failure
+                setData(prevData =>
+                    prevData.map(user => (user._id === userId ? currentUser : user))
+                );
                 toast.error(res.message || "Cập nhật thất bại.");
             }
-        } catch (err) {
-            toast.error("Cập nhật người dùng thất bại.");
+        } catch (err: any) {
+            // Rollback to original state on error
+            setData(prevData =>
+                prevData.map(user => (user._id === userId ? currentUser : user))
+            );
+            
+            const errorMessage = err.response?.data?.message || "Cập nhật người dùng thất bại.";
+            toast.error(errorMessage);
             console.error("Update user error:", err);
-            fetchUsers();
         } finally {
             setUpdateLoading(null);
         }
@@ -313,61 +389,89 @@ export default function UserTable() {
 
     return (
         <>
-            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-white/[0.05] dark:bg-white/[0.03]">
-                {/* Header Section với thống kê */}
-                <div className="border-b border-gray-100 bg-gray-50/50 px-6 py-4 dark:border-white/[0.05] dark:bg-white/[0.02]">
+            {/* Enhanced Container */}
+            <div className="overflow-hidden rounded-2xl border border-gray-200/60 bg-white shadow-2xl shadow-gray-500/10 dark:border-white/[0.08] dark:bg-gray-900/50 dark:shadow-black/20 backdrop-blur-sm">
+                {/* Enhanced Header Section */}
+                <div className="relative border-b border-gray-200/60 bg-gradient-to-r from-gray-50/80 to-white/80 px-8 py-6 dark:border-white/[0.08] dark:from-gray-800/50 dark:to-gray-900/50 backdrop-blur-sm">
                     <div className="flex items-center justify-between">
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                Quản lý người dùng
-                            </h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                Tổng cộng {totalItems} người dùng
-                            </p>
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg">
+                                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent dark:from-white dark:to-gray-300">
+                                    Quản lý người dùng
+                                </h3>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    Tổng cộng <span className="font-semibold text-blue-600 dark:text-blue-400">{totalItems}</span> người dùng
+                                </p>
+                                <div className="h-4 w-px bg-gray-300 dark:bg-gray-600"></div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">Đang hoạt động</span>
+                                </div>
+                            </div>
                         </div>
                         <button
                             onClick={() => openModal("add")}
                             type="button"
-                            className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 border border-transparent rounded-lg shadow-sm hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+                            className="group inline-flex items-center px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 via-blue-700 to-purple-700 border border-transparent rounded-xl shadow-lg hover:shadow-xl hover:shadow-blue-500/25 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 transform hover:scale-105 hover:-translate-y-0.5"
                         >
-                            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-5 h-5 mr-2 group-hover:rotate-180 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M10 5C10.5523 5 11 5.44772 11 6V9H14C14.5523 9 15 9.44772 15 10C15 10.5523 14.5523 11 14 11H11V14C11 14.5523 10.5523 15 10 15C9.44772 15 9 14.5523 9 14V11H6C5.44772 11 5 10.5523 5 10C5 9.44772 5.44772 9 6 9H9V6C9 5.44772 9.44772 5 10 5Z" clipRule="evenodd"/>
                             </svg>
-                            Thêm người dùng
+                            Thêm người dùng mới
+                            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-white/20 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         </button>
                     </div>
                 </div>
 
-                {/* Filters and Search */}
-                <div className="p-6 border-b border-gray-100 dark:border-white/[0.05]">
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
+                {/* Enhanced Filters and Search */}
+                <div className="p-8 border-b border-gray-200/60 bg-gradient-to-r from-gray-50/30 to-transparent dark:border-white/[0.08] dark:from-gray-800/20">
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
                         <div className="xl:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Tìm kiếm
+                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                                <span className="flex items-center gap-2">
+                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd"/>
+                                    </svg>
+                                    Tìm kiếm
+                                </span>
                             </label>
-                            <div className="relative">
+                            <div className="relative group">
                                 <input
                                     type="text"
-                                    placeholder="Nhập tên tài khoản..."
+                                    placeholder="Nhập tên tài khoản để tìm kiếm..."
                                     value={usernameInput}
                                     onChange={(e) => setUsernameInput(e.target.value)}
                                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                                    className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+                                    className="w-full pl-12 pr-4 py-3.5 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/80 backdrop-blur-sm hover:border-gray-300 dark:bg-gray-800/80 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-400"
                                 />
-                                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M12.9 14.32C11.66 15.41 9.99 16 8.25 16C3.69 16 0 12.31 0 7.75S3.69 -0.5 8.25 -0.5S16.5 3.19 16.5 7.75C16.5 9.49 15.91 11.16 14.82 12.4L19.78 17.36C20.17 17.75 20.17 18.38 19.78 18.77C19.39 19.16 18.76 19.16 18.37 18.77L12.9 14.32ZM8.25 2C4.93 2 2.25 4.68 2.25 8S4.93 14 8.25 14S14.25 11.32 14.25 8S11.57 2 8.25 2Z" clipRule="evenodd"/>
-                                </svg>
+                                <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                                    <svg className="w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors duration-200" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd"/>
+                                    </svg>
+                                </div>
                             </div>
                         </div>
                         
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Vai trò
+                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                                <span className="flex items-center gap-2">
+                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    Vai trò
+                                </span>
                             </label>
                             <select
                                 value={filters.role}
                                 onChange={(e) => setFilters({ ...filters, role: e.target.value, page: 1 })}
-                                className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                className="w-full px-4 py-3.5 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/80 backdrop-blur-sm hover:border-gray-300 dark:bg-gray-800/80 dark:border-gray-600 dark:text-white"
                             >
                                 <option value="">Tất cả vai trò</option>
                                 {Object.entries(information.role).map(([key, label]) => (
@@ -377,30 +481,35 @@ export default function UserTable() {
                         </div>
                         
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Trạng thái
+                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                                <span className="flex items-center gap-2">
+                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                                    </svg>
+                                    Trạng thái
+                                </span>
                             </label>
                             <select
                                 value={filters.status}
                                 onChange={(e) => setFilters({ ...filters, status: e.target.value, page: 1 })}
-                                className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                className="w-full px-4 py-3.5 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/80 backdrop-blur-sm hover:border-gray-300 dark:bg-gray-800/80 dark:border-gray-600 dark:text-white"
                             >
                                 <option value="">Tất cả trạng thái</option>
-                                <option value="true">Hoạt động</option>
-                                <option value="false">Tạm ngừng</option>
+                                <option value={UserStatus.ACTIVE}>{getStatusLabel(UserStatus.ACTIVE)}</option>
+                                <option value={UserStatus.INACTIVE}>{getStatusLabel(UserStatus.INACTIVE)}</option>
                             </select>
                         </div>
                         
-                        <div className="flex items-end gap-2">
+                        <div className="flex items-end gap-3">
                             <button
                                 onClick={handleSearch}
-                                className="px-4 py-2.5 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                                className="px-6 py-3.5 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 border border-transparent rounded-xl hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
                             >
                                 Tìm kiếm
                             </button>
                             <button
                                 onClick={clearFilters}
-                                className="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+                                className="px-6 py-3.5 text-sm font-semibold text-gray-700 bg-white border-2 border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
                             >
                                 Xóa bộ lọc
                             </button>
@@ -408,26 +517,25 @@ export default function UserTable() {
                     </div>
                 </div>
 
-                {/* Table */}
+                {/* Enhanced Table */}
                 <div className="overflow-x-auto">
                     <div className="min-w-full">
                         <Table>
-                            <TableHeader className="bg-gray-50/50 dark:bg-white/[0.02]">
+                            <TableHeader className="bg-gradient-to-r from-gray-50 to-gray-100/50 dark:from-gray-800/50 dark:to-gray-900/30 backdrop-blur-sm">
                                 <TableRow>
                                     {[
-                                        { key: "stt", label: "STT", width: "w-16" },
-                                        { key: "username", label: "Tên tài khoản", width: "min-w-32" },
-                                        { key: "site", label: "Hệ thống", width: "min-w-20" },
+                                        { key: "stt", label: "STT", width: "w-20" },
+                                        { key: "username", label: "Thông tin tài khoản", width: "min-w-48" },
                                         { key: "role", label: "Vai trò", width: "min-w-32" },
-                                        { key: "status", label: "Trạng thái", width: "min-w-32" },
-                                        { key: "created", label: "Ngày tạo", width: "min-w-28" },
-                                        { key: "updated", label: "Cập nhật", width: "min-w-28" },
-                                        { key: "actions", label: "Thao tác", width: "min-w-36" }
+                                        { key: "status", label: "Trạng thái", width: "min-w-36" },
+                                        { key: "created", label: "Ngày tạo", width: "min-w-32" },
+                                        { key: "updated", label: "Cập nhật", width: "min-w-32" },
+                                        { key: "actions", label: "Thao tác", width: "min-w-40" }
                                     ].map((header) => (
                                         <TableCell
                                             key={header.key}
                                             isHeader
-                                            className={`px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider dark:text-gray-400 ${header.width} ${header.key === "actions" ? "text-center" : ""}`}
+                                            className={`px-8 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300 ${header.width}`}
                                         >
                                             {header.label}
                                         </TableCell>
@@ -435,78 +543,104 @@ export default function UserTable() {
                                 </TableRow>
                             </TableHeader>
 
-                            <TableBody className="bg-white divide-y divide-gray-100 dark:bg-transparent dark:divide-white/[0.05]">
+                            <TableBody className="bg-white divide-y divide-gray-100/60 dark:bg-transparent dark:divide-white/[0.05]">
                                 {loading ? (
                                     <TableSkeleton />
                                 ) : data.length > 0 ? (
                                     data.map((user, index) => (
                                         <TableRow 
                                             key={user._id}
-                                            className="hover:bg-gray-50/50 transition-colors duration-150 dark:hover:bg-white/[0.02]"
+                                            className="group hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-purple-50/30 transition-all duration-300 dark:hover:from-blue-900/10 dark:hover:to-purple-900/10"
                                         >
-                                            <TableCell className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
-                                                {(filters.page - 1) * filters.limit + index + 1}
+                                            <TableCell className="px-8 py-6 text-sm font-bold text-gray-900 dark:text-white">
+                                                <div className="flex items-center justify-center">
+                                                    <span className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                                                        {(filters.page - 1) * filters.limit + index + 1}
+                                                    </span>
+                                                </div>
                                             </TableCell>
                                             
-                                            <TableCell className="px-6 py-4">
-                                                <div className="flex items-center">
-                                                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium mr-3">
-                                                        {user.username.charAt(0).toUpperCase()}
+                                            <TableCell className="px-8 py-6">
+                                                <div className="flex items-center space-x-4">
+                                                    <div className="flex-shrink-0">
+                                                        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                                                            <span className="text-white font-bold text-lg">
+                                                                {user.username.charAt(0).toUpperCase()}
+                                                            </span>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                                                    <div className="space-y-1">
+                                                        <div className="text-sm font-semibold text-gray-900 dark:text-white">
                                                             {user.username}
                                                         </div>
-                                                        <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                            ID: {user._id.slice(-6)}
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+                                                            ID: {user._id.slice(-8)}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </TableCell>
                                             
-                                            <TableCell className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
-                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">
-                                                    {user.site}
-                                                </span>
-                                            </TableCell>
-                                            
-                                            <TableCell className="px-6 py-4">
-                                                <select
-                                                    name="role"
-                                                    className="text-sm border border-gray-200 rounded-md px-3 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-                                                    value={user.role}
-                                                    onChange={(e) => handleUpdateUser(user._id, { role: e.target.value })}
-                                                    disabled={updateLoading === user._id}
-                                                >
-                                                    {Object.entries(information.role).map(([key, label]) => (
-                                                        <option key={key} value={key}>
-                                                            {label}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </TableCell>
-                                            
-                                            <TableCell className="px-6 py-4">
-                                                <StatusBadge 
-                                                    status={user.status}
-                                                    loading={updateLoading === user._id}
-                                                    onClick={() => handleUpdateUser(user._id, { status: !user.status })}
-                                                />
-                                            </TableCell>
-                                            
-                                            <TableCell className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
-                                                <div className="text-sm">
-                                                    {formatDateTimeVN(user.createdAt)}
+                                            <TableCell className="px-8 py-6">
+                                                <div className="flex justify-center">
+                                                    <select
+                                                        name="role"
+                                                        className="text-sm border-2 border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed hover:border-gray-300"
+                                                        value={user.role}
+                                                        onChange={(e) => handleRoleChange(user._id, e.target.value)}
+                                                        disabled={updateLoading === user._id}
+                                                    >
+                                                        {Object.entries(information.role).map(([key, label]) => (
+                                                            <option key={key} value={key}>
+                                                                {label}
+                                                            </option>
+                                                        ))}
+                                                    </select>
                                                 </div>
                                             </TableCell>
                                             
-                                            <TableCell className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
-                                                <div className="text-sm">
-                                                    {formatDateTimeVN(user.updatedAt)}
+                                            <TableCell className="px-8 py-6">
+                                                <div className="flex justify-center items-center gap-3">
+                                                    <Switch
+                                                        label={getStatusLabel(user.status)}
+                                                        checked={isActiveStatus(user.status)}
+                                                        disabled={updateLoading === user._id}
+                                                        onChange={(checked) => handleStatusChange(user._id, checked ? UserStatus.ACTIVE : UserStatus.INACTIVE)}
+                                                        color="blue"
+                                                    />
+                                                    {updateLoading === user._id && (
+                                                        <div className="flex items-center">
+                                                            <svg className="animate-spin h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24">
+                                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                                <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 0 1 4 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                            </svg>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </TableCell>
                                             
-                                            <TableCell className="px-6 py-4">
+                                            <TableCell className="px-8 py-6 text-sm text-gray-600 dark:text-gray-300">
+                                                <div className="space-y-1">
+                                                    <div className="text-sm font-medium">
+                                                        {formatDateTimeVN(user.createdAt)}
+                                                    </div>
+                                                    <div className="text-xs text-gray-400">
+                                                        {new Date(user.createdAt).toLocaleDateString('vi-VN')}
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            
+                                            <TableCell className="px-8 py-6 text-sm text-gray-600 dark:text-gray-300">
+                                                <div className="space-y-1">
+                                                    <div className="text-sm font-medium">
+                                                        {formatDateTimeVN(user.updatedAt)}
+                                                    </div>
+                                                    <div className="text-xs text-gray-400">
+                                                        {new Date(user.updatedAt).toLocaleDateString('vi-VN')}
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            
+                                            <TableCell className="px-8 py-6">
                                                 <ActionButtons
                                                     loading={updateLoading === user._id}
                                                     onChangePassword={() => {
@@ -520,17 +654,27 @@ export default function UserTable() {
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={8} className="px-6 py-16 text-center">
-                                            <div className="flex flex-col items-center justify-center">
-                                                <svg className="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
-                                                </svg>
-                                                <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                                                    Không tìm thấy người dùng
-                                                </h3>
-                                                <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                    Thử thay đổi bộ lọc hoặc tạo người dùng mới
-                                                </p>
+                                        <TableCell colSpan={7} className="px-8 py-20 text-center">
+                                            <div className="flex flex-col items-center justify-center space-y-6">
+                                                <div className="w-24 h-24 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center dark:from-gray-800 dark:to-gray-700">
+                                                    <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                                                    </svg>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                                        Không tìm thấy người dùng
+                                                    </h3>
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md">
+                                                        Không có người dùng nào phù hợp với tiêu chí tìm kiếm. Hãy thử thay đổi bộ lọc hoặc tạo người dùng mới.
+                                                    </p>
+                                                </div>
+                                                <button
+                                                    onClick={() => openModal("add")}
+                                                    className="px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105"
+                                                >
+                                                    Tạo người dùng đầu tiên
+                                                </button>
                                             </div>
                                         </TableCell>
                                     </TableRow>
@@ -540,19 +684,19 @@ export default function UserTable() {
                     </div>
                 </div>
 
-                {/* Pagination */}
+                {/* Enhanced Pagination */}
                 {!loading && data.length > 0 && (
-                    <div className="bg-white px-6 py-4 border-t border-gray-100 dark:bg-transparent dark:border-white/[0.05]">
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm text-gray-700 dark:text-gray-300">Hiển thị</span>
+                    <div className="bg-gradient-to-r from-white to-gray-50/50 px-8 py-6 border-t border-gray-200/60 dark:from-gray-900/50 dark:to-gray-800/30 dark:border-white/[0.08] backdrop-blur-sm">
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+                            <div className="flex items-center gap-4">
+                                <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">Hiển thị</span>
                                 <select
                                     name="limit"
                                     value={filters.limit}
                                     onChange={(e) => {
                                         setFilters((prev) => ({ ...prev, limit: Number(e.target.value), page: 1 }));
                                     }}
-                                    className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                    className="border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                                 >
                                     <option value="10">10</option>
                                     <option value="20">20</option>
@@ -560,7 +704,7 @@ export default function UserTable() {
                                     <option value="100">100</option>
                                 </select>
                                 <span className="text-sm text-gray-700 dark:text-gray-300">
-                                    trong tổng số {totalItems} kết quả
+                                    trong tổng số <span className="font-semibold text-blue-600 dark:text-blue-400">{totalItems}</span> kết quả
                                 </span>
                             </div>
 
@@ -576,17 +720,28 @@ export default function UserTable() {
                 )}
             </div>
 
-            {/* Modal Form */}
-            <Modal isOpen={isOpen} onClose={handleCloseModal} className="max-w-[600px] m-4">
-                <div className="relative w-full max-w-[600px] bg-white rounded-2xl shadow-xl dark:bg-gray-900">
-                    {/* Modal Header */}
-                    <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                            {modalType === "add" ? "Tạo người dùng mới" : "Đổi mật khẩu"}
-                        </h3>
+            {/* Enhanced Modal Form */}
+            <Modal isOpen={isOpen} onClose={handleCloseModal} className="max-w-[700px] m-4">
+                <div className="relative w-full max-w-[700px] bg-white rounded-3xl shadow-2xl dark:bg-gray-900 backdrop-blur-sm border border-gray-200/60 dark:border-white/[0.08]">
+                    {/* Enhanced Modal Header */}
+                    <div className="flex items-center justify-between p-8 border-b border-gray-200/60 dark:border-gray-700 bg-gradient-to-r from-gray-50/50 to-transparent dark:from-gray-800/30">
+                        <div className="flex items-center gap-4">
+                            <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg">
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    {modalType === "add" ? (
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    ) : (
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m0 0a2 2 0 01-2 2m2-2h.01M9 5a2 2 0 00-2 2v.01M9 5a2 2 0 012-2 2 2 0 012 2m-2 4a2 2 0 00-2 2v.01m2-4.01V9a2 2 0 012-2 2 2 0 012 2v.01M9 9.01V9a2 2 0 012-2 2 2 0 012 2v.01" />
+                                    )}
+                                </svg>
+                            </div>
+                            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                                {modalType === "add" ? "Tạo người dùng mới" : "Đổi mật khẩu"}
+                            </h3>
+                        </div>
                         <button
                             onClick={handleCloseModal}
-                            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
                         >
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -594,13 +749,16 @@ export default function UserTable() {
                         </button>
                     </div>
 
-                    {/* Modal Body */}
+                    {/* Enhanced Modal Body */}
                     <form onSubmit={handleSave}>
-                        <div className="p-6 space-y-6">
+                        <div className="p-8 space-y-8">
                             {modalType === "add" && (
                                 <>
-                                    <div>
-                                        <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    <div className="space-y-3">
+                                        <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"/>
+                                            </svg>
                                             Tên tài khoản
                                         </Label>
                                         <Input
@@ -610,17 +768,20 @@ export default function UserTable() {
                                             name="username"
                                             onChange={handleChange}
                                             required
-                                            className="mt-1"
+                                            className="w-full px-4 py-3.5 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                                         />
                                     </div>
 
-                                    <div>
-                                        <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    <div className="space-y-3">
+                                        <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
                                             Vai trò
                                         </Label>
                                         <select
                                             name="role"
-                                            className="mt-1 w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                            className="w-full px-4 py-3.5 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                                             value={form.role}
                                             onChange={handleChange}
                                         >
@@ -635,8 +796,11 @@ export default function UserTable() {
                             )}
 
                             {modalType === "changePass" && (
-                                <div>
-                                    <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                <div className="space-y-3">
+                                    <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/>
+                                        </svg>
                                         Mật khẩu cũ
                                     </Label>
                                     <Input
@@ -646,16 +810,19 @@ export default function UserTable() {
                                         name="oldPassword"
                                         onChange={handleChange}
                                         required
-                                        className="mt-1"
+                                        className="w-full px-4 py-3.5 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                                     />
                                 </div>
                             )}
 
-                            <div>
-                                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <div className="space-y-3">
+                                <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/>
+                                    </svg>
                                     {modalType === "add" ? "Mật khẩu" : "Mật khẩu mới"}
                                 </Label>
-                                <div className="relative mt-1">
+                                <div className="relative">
                                     <Input
                                         type={showPassword ? "text" : "password"}
                                         placeholder={modalType === "add" ? "Nhập mật khẩu" : "Nhập mật khẩu mới"}
@@ -663,12 +830,12 @@ export default function UserTable() {
                                         name="password"
                                         onChange={handleChange}
                                         required
-                                        className="pr-12"
+                                        className="w-full px-4 py-3.5 pr-12 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
                                     >
                                         {showPassword ? (
                                             <EyeIcon className="w-5 h-5" />
@@ -680,30 +847,35 @@ export default function UserTable() {
                             </div>
 
                             {error && (
-                                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                                    <p className="text-sm text-red-600">{error}</p>
+                                <div className="bg-gradient-to-r from-red-50 to-red-100/50 border-2 border-red-200 rounded-xl p-4 shadow-lg dark:from-red-900/20 dark:to-red-800/10 dark:border-red-800">
+                                    <div className="flex items-center gap-3">
+                                        <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
+                                        </svg>
+                                        <p className="text-sm font-medium text-red-800 dark:text-red-400">{error}</p>
+                                    </div>
                                 </div>
                             )}
                         </div>
 
-                        {/* Modal Footer */}
-                        <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
+                        {/* Enhanced Modal Footer */}
+                        <div className="flex items-center justify-end gap-4 p-8 border-t border-gray-200/60 dark:border-gray-700 bg-gradient-to-r from-gray-50/30 to-transparent dark:from-gray-800/20">
                             <Button 
                                 type="button"
                                 variant="outline" 
                                 onClick={handleCloseModal}
-                                className="px-4 py-2"
+                                className="px-6 py-3 text-sm font-semibold border-2 rounded-xl transition-all duration-200 hover:scale-105"
                             >
                                 Hủy bỏ
                             </Button>
                             <Button 
                                 type="submit" 
                                 disabled={loading}
-                                className="px-6 py-2 bg-blue-600 hover:bg-blue-700"
+                                className="px-8 py-3 text-sm font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                             >
                                 {loading ? (
                                     <div className="flex items-center">
-                                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                             <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 0 1 4 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
@@ -717,6 +889,22 @@ export default function UserTable() {
                     </form>
                 </div>
             </Modal>
+
+            <style jsx>{`
+                @keyframes shimmer {
+                    0% {
+                        background-position: -200px 0;
+                    }
+                    100% {
+                        background-position: calc(200px + 100%) 0;
+                    }
+                }
+                .animate-shimmer {
+                    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+                    background-size: 200px 100%;
+                    animation: shimmer 1.5s infinite;
+                }
+            `}</style>
         </>
     );
 }

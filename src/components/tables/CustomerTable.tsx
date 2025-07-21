@@ -13,6 +13,7 @@ import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import customerServices from '@/services/customerServices';
 import { useAuth } from "@/context/AuthContext";
+import { getStatusLabel } from "@/types/user";
 import { getSiteSystem } from "@/utils/storage";
 import { formatDateTimeVN } from "@/utils/formatDateTime";
 import Pagination from "@/layout/Pagination";
@@ -266,7 +267,7 @@ export default function Customer() {
                                         <TableCell className="px-5 py-4 sm:px-6 text-start">{customer.phone_number}</TableCell>
                                         <TableCell className="px-5 py-4 sm:px-6 text-start">{formatDateTimeVN(customer.updatedAt)}</TableCell>
                                         <TableCell className="px-5 py-4 sm:px-6 text-center">
-                                            {customer.status ? "Hoạt động" : "Tạm ngừng"}
+                                            {getStatusLabel(customer.status.toString())}
                                             <br />
                                             <button
                                                 onClick={() => updateCustomerStatus(customer.username, customer.site)}

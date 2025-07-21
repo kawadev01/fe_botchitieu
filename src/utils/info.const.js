@@ -42,6 +42,11 @@ export const information = {
     superadmin: "Supper Admin ( Quản trị viên )"
   },
 
+  user_status: {
+    active: "Hoạt động",
+    inactive: "Tạm ngừng"
+  },
+
   order_status: {
     pending: "Chờ đẩy đơn",
     confirm: "Xác nhận",
