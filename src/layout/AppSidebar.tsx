@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { usePathname, useSearchParams } from "next/navigation";
 import {
   ChevronDownIcon,
-  HorizontaLDots,
+  UserCircleIcon,
   ListIcon,
   TableIcon,
 } from "../icons/index";
@@ -30,16 +30,16 @@ type NavItem = {
 const navItems: NavItem[] = [
   {
     name: "Quản lý truy cập",
-    icon: <ListIcon />,
+    icon: <UserCircleIcon />,
     subItems: [
       {
-        name: "Danh sách tài khoản",
+        name: "Tài khoản",
         path: "/admin/user",
         pro: false,
-        role: ["superadmin"],
+        role: ["admin","superadmin"],
       },
       {
-        name: "Danh sách IP WhiteList",
+        name: "Whitelist IP",
         path: "/admin/ip_whitelist",
         pro: false,
         role: ["superadmin"],
@@ -302,51 +302,24 @@ const AppSidebar: React.FC = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`py-8 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
-          }`}
+        className={`py-8 flex justify-center }`}
       >
         <div className="flex gap-2 items-center">
-          {(isExpanded || isHovered || isMobileOpen) && <div>ATT - ADMIN</div>}
-          
-          <Image
-            src="/images/logo/logo-icon.svg"
-            alt="Logo"
-            width={32}
-            height={32}
-          />
+          {/* Hiển thị tên site từ AuthContext nếu có, fallback ATT - ADMIN */}
+          {(isExpanded || isHovered || isMobileOpen) && (
+            <div>
+              {user?.site ? user.site.toUpperCase() + " - BOTCHITIEU" : "BOTCHITIEU"}
+            </div>
+          )}
         </div>
       </div>
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
             <div>
-              <h2
-                className={`mb-4 text-xs uppercase flex text-gray-400 ${!isExpanded && !isHovered
-                  ? "lg:justify-center"
-                  : "justify-start"
-                  }`}
-              >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  "TÍNH NĂNG HỆ THỐNG"
-                ) : (
-                  <HorizontaLDots />
-                )}
-              </h2>
               {renderMenuItems(navItems, "main")}
             </div>
             <div>
-              <h2
-                className={`mb-4 text-xs uppercase flex text-gray-400 ${!isExpanded && !isHovered
-                  ? "lg:justify-center"
-                  : "justify-start"
-                  }`}
-              >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  "TÍNH NĂNG NGƯỜI DÙNG"
-                ) : (
-                  <HorizontaLDots />
-                )}
-              </h2>
               {renderMenuItems(othersItems, "others")}
             </div>
           </div>

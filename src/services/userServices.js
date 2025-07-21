@@ -2,25 +2,24 @@ import { toast } from "react-toastify";
 import baseApi from "../lib/baseApi";
 
 const handleError = (error, message = "Đã xảy ra lỗi") => {
+    const errorMessage = error.response?.data?.message || message;
     console.error(message, error);
-    toast.error(message);
-    throw error;
+    toast.error(errorMessage);
+    // Trả về một cấu trúc lỗi để phía component có thể bắt và xử lý
+    return { success: false, message: errorMessage, data: null };
 };
 
 const userServices = {
     getUser: async (params = {}) => {
         try {
             const res = await baseApi.get("/users", { params });
-            const { items, total, page, pageSize, totalPages } = res.data.data;
-
-            return {
-                users: items,
-                total,
-                page: page,
-                pageSize,
-                totalPages
-            };
-
+            // Cập nhật theo cấu trúc response mới từ API_DOCUMENTATION.md
+            if (res.data.success) {
+                return res.data; // res.data đã chứa { success, data: { data, meta }, message }
+            } else {
+                toast.error(res.data.message || "Lấy danh sách người dùng thất bại.");
+                return { success: false, data: { data: [], meta: {} } };
+            }
         } catch (error) {
             return handleError(error, "Lỗi khi lấy danh sách người dùng");
         }
@@ -38,45 +37,36 @@ const userServices = {
     postUser: async (credentials) => {
         try {
             const res = await baseApi.post("/users", credentials);
-            toast.success("Tạo người dùng thành công!");
-            return res.data;
+            return res.data; // API trả về { success, data, message }
         } catch (error) {
             return handleError(error, "Lỗi khi tạo người dùng");
         }
     },
 
+    // Hàm chung để cập nhật thông tin người dùng (role, status, etc.)
+    updateUser: async (id, updateData) => {
+        try {
+            const res = await baseApi.patch(`/users/${id}`, updateData);
+            return res.data;
+        } catch (error) {
+            return handleError(error, "Lỗi khi cập nhật người dùng");
+        }
+    },
+    
+    // Lưu ý: API doc không có endpoint đổi mật khẩu. Hàm này là giả định.
+    // Nếu cần, bạn cần định nghĩa endpoint trong backend.
     changePasswordUser: async (form, id) => {
         try {
             let credentials = {
                 oldPassword: form.oldPassword,
                 newPassword: form.password
             };
-
-            const res = await baseApi.patch(`/users/update-password/${id}`, credentials);
+            // Giả sử endpoint là `/users/{id}/change-password`
+            const res = await baseApi.patch(`/users/${id}/change-password`, credentials);
             toast.success("Đổi mật khẩu thành công!");
             return res.data;
         } catch (error) {
             return handleError(error, "Lỗi khi đổi mật khẩu người dùng");
-        }
-    },
-
-    changeUserStatus: async (id) => {
-        try {
-            const res = await baseApi.patch(`/users/update-status/${id}`);
-            toast.success(res.data.message);
-            return res.data;
-        } catch (error) {
-            return handleError(error, "Lỗi khi đổi status người dùng");
-        }
-    },
-
-    changeUserRole: async (id, role) => {
-        try {
-            const res = await baseApi.patch(`/users/update-role?id=${id}&role=${role}`);
-            toast.success(res.data.message);
-            return res.data;
-        } catch (error) {
-            return handleError(error, "Lỗi khi quyền người dùng");
         }
     },
 
