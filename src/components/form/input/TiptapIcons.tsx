@@ -1,0 +1,21 @@
+import React from "react";
+
+export const BoldIcon = () => <b>B</b>;
+export const ItalicIcon = () => <i>I</i>;
+export const StrikethroughIcon = () => <s>S</s>;
+export const CodeIcon = () => <code>{"</>"}</code>;
+export const ParagraphIcon = () => <span>P</span>;
+export const Heading1Icon = () => <span>H1</span>;
+export const Heading2Icon = () => <span>H2</span>;
+export const BulletListIcon = () => <span>&#8226;</span>;
+export const OrderedListIcon = () => <span>1.</span>;
+export const LinkIcon = () => <span>🔗</span>;
+export const UnlinkIcon = () => <span>❌</span>;
+export const ImageIcon = () => <span>🖼️</span>;
+export const UndoIcon = () => <span>↩</span>;
+export const RedoIcon = () => <span>↪</span>;
+export const AlignLeftIcon = () => <span>⬅</span>;
+export const AlignCenterIcon = () => <span>⬅➡</span>;
+export const AlignRightIcon = () => <span>➡</span>;
+export const MinusIcon = () => <span>—</span>;
+export const TableIcon = () => <span>📊</span>;
