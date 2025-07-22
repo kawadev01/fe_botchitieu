@@ -53,17 +53,14 @@ const userServices = {
         }
     },
     
-    // Lưu ý: API doc không có endpoint đổi mật khẩu. Hàm này là giả định.
-    // Nếu cần, bạn cần định nghĩa endpoint trong backend.
+    // Đổi mật khẩu sử dụng endpoint PATCH /users/:id 
     changePasswordUser: async (form, id) => {
         try {
-            let credentials = {
-                oldPassword: form.oldPassword,
-                newPassword: form.password
+            // Sử dụng endpoint cập nhật thông tin người dùng với trường password
+            const credentials = {
+                password: form.password
             };
-            // Giả sử endpoint là `/users/{id}/change-password`
-            const res = await baseApi.patch(`/users/${id}/change-password`, credentials);
-            toast.success("Đổi mật khẩu thành công!");
+            const res = await baseApi.patch(`/users/${id}`, credentials);
             return res.data;
         } catch (error) {
             return handleError(error, "Lỗi khi đổi mật khẩu người dùng");

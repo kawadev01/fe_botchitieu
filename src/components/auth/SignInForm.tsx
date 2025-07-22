@@ -17,7 +17,7 @@ export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const router = useRouter();
-  const [form, setForm] = useState({ username: 'admin', password: '@Matkhau88' });
+  const [form, setForm] = useState({ username: 'admin', password: 'qweasdzxc' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { refreshUser } = useAuth();

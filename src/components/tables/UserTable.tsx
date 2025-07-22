@@ -13,7 +13,6 @@ import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
 import Switch from "../form/switch/Switch";
-import { EyeCloseIcon, EyeIcon } from "@/icons";
 import userServices from '@/services/userServices';
 import { getSiteSystem } from "@/utils/storage";
 import { information } from '@/utils/info.const';
@@ -28,11 +27,96 @@ import {
     toggleStatus 
 } from "@/types/user";
 
+// Inline SVG Icons Components để tránh vấn đề SVGR
+const EyeIcon = ({ className = "" }: { className?: string }) => (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className={className}>
+        <path fillRule="evenodd" clipRule="evenodd" d="M10.0002 13.8619C7.23361 13.8619 4.86803 12.1372 3.92328 9.70241C4.86804 7.26761 7.23361 5.54297 10.0002 5.54297C12.7667 5.54297 15.1323 7.26762 16.0771 9.70243C15.1323 12.1372 12.7667 13.8619 10.0002 13.8619ZM10.0002 4.04297C6.48191 4.04297 3.49489 6.30917 2.4155 9.4593C2.3615 9.61687 2.3615 9.78794 2.41549 9.94552C3.49488 13.0957 6.48191 15.3619 10.0002 15.3619C13.5184 15.3619 16.5055 13.0957 17.5849 9.94555C17.6389 9.78797 17.6389 9.6169 17.5849 9.45932C16.5055 6.30919 13.5184 4.04297 10.0002 4.04297ZM9.99151 7.84413C8.96527 7.84413 8.13333 8.67606 8.13333 9.70231C8.13333 10.7286 8.96527 11.5605 9.99151 11.5605H10.0064C11.0326 11.5605 11.8646 10.7286 11.8646 9.70231C11.8646 8.67606 11.0326 7.84413 10.0064 7.84413H9.99151Z" />
+    </svg>
+);
+
+const EyeCloseIcon = ({ className = "" }: { className?: string }) => (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className={className}>
+        <path fillRule="evenodd" clipRule="evenodd" d="M4.63803 3.57709C4.34513 3.2842 3.87026 3.2842 3.57737 3.57709C3.28447 3.86999 3.28447 4.34486 3.57737 4.63775L4.85323 5.91362C3.74609 6.84199 2.89363 8.06395 2.4155 9.45936C2.3615 9.61694 2.3615 9.78801 2.41549 9.94558C3.49488 13.0957 6.48191 15.3619 10.0002 15.3619C11.255 15.3619 12.4422 15.0737 13.4994 14.5598L15.3625 16.4229C15.6554 16.7158 16.1302 16.7158 16.4231 16.4229C16.716 16.13 16.716 15.6551 16.4231 15.3622L4.63803 3.57709ZM12.3608 13.4212L10.4475 11.5079C10.3061 11.5423 10.1584 11.5606 10.0064 11.5606H9.99151C8.96527 11.5606 8.13333 10.7286 8.13333 9.70237C8.13333 9.5461 8.15262 9.39434 8.18895 9.24933L5.91885 6.97923C5.03505 7.69015 4.34057 8.62704 3.92328 9.70247C4.86803 12.1373 7.23361 13.8619 10.0002 13.8619C10.8326 13.8619 11.6287 13.7058 12.3608 13.4212ZM16.0771 9.70249C15.7843 10.4569 15.3552 11.1432 14.8199 11.7311L15.8813 12.7925C16.6329 11.9813 17.2187 11.0143 17.5849 9.94561C17.6389 9.78803 17.6389 9.61696 17.5849 9.45938C16.5055 6.30925 13.5184 4.04303 10.0002 4.04303C9.13525 4.04303 8.30244 4.17999 7.52218 4.43338L8.75139 5.66259C9.1556 5.58413 9.57311 5.54303 10.0002 5.54303C12.7667 5.54303 15.1323 7.26768 16.0771 9.70249Z" />
+    </svg>
+);
+
+const PlusIcon = ({ className = "" }: { className?: string }) => (
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+        <path fillRule="evenodd" clipRule="evenodd" d="M5.25012 3C5.25012 2.58579 5.58591 2.25 6.00012 2.25C6.41433 2.25 6.75012 2.58579 6.75012 3V5.25012L9.00034 5.25012C9.41455 5.25012 9.75034 5.58591 9.75034 6.00012C9.75034 6.41433 9.41455 6.75012 9.00034 6.75012H6.75012V9.00034C6.75012 9.41455 6.41433 9.75034 6.00012 9.75034C5.58591 9.75034 5.25012 9.41455 5.25012 9.00034L5.25012 6.75012H3C2.58579 6.75012 2.25 6.41433 2.25 6.00012C2.25 5.58591 2.58579 5.25012 3 5.25012H5.25012V3Z" fill="currentColor" />
+    </svg>
+);
+
+const UserCircleIcon = ({ className = "" }: { className?: string }) => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+        <path fillRule="evenodd" clipRule="evenodd" d="M12 3.5C7.30558 3.5 3.5 7.30558 3.5 12C3.5 14.1526 4.3002 16.1184 5.61936 17.616C6.17279 15.3096 8.24852 13.5955 10.7246 13.5955H13.2746C15.7509 13.5955 17.8268 15.31 18.38 17.6167C19.6996 16.119 20.5 14.153 20.5 12C20.5 7.30558 16.6944 3.5 12 3.5ZM17.0246 18.8566V18.8455C17.0246 16.7744 15.3457 15.0955 13.2746 15.0955H10.7246C8.65354 15.0955 6.97461 16.7744 6.97461 18.8455V18.856C8.38223 19.8895 10.1198 20.5 12 20.5C13.8798 20.5 15.6171 19.8898 17.0246 18.8566ZM2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12ZM11.9991 7.25C10.8847 7.25 9.98126 8.15342 9.98126 9.26784C9.98126 10.3823 10.8847 11.2857 11.9991 11.2857C13.1135 11.2857 14.0169 10.3823 14.0169 9.26784C14.0169 8.15342 13.1135 7.25 11.9991 7.25ZM8.48126 9.26784C8.48126 7.32499 10.0563 5.75 11.9991 5.75C13.9419 5.75 15.5169 7.32499 15.5169 9.26784C15.5169 11.2107 13.9419 12.7857 11.9991 12.7857C10.0563 12.7857 8.48126 11.2107 8.48126 9.26784Z" fill="currentColor"/>
+    </svg>
+);
+
+const PencilIcon = ({ className = "" }: { className?: string }) => (
+    <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+        <path fillRule="evenodd" clipRule="evenodd" d="M17.0911 3.53206C16.2124 2.65338 14.7878 2.65338 13.9091 3.53206L5.6074 11.8337C5.29899 12.1421 5.08687 12.5335 4.99684 12.9603L4.26177 16.445C4.20943 16.6931 4.286 16.9508 4.46529 17.1301C4.64458 17.3094 4.90232 17.3859 5.15042 17.3336L8.63507 16.5985C9.06184 16.5085 9.45324 16.2964 9.76165 15.988L18.0633 7.68631C18.942 6.80763 18.942 5.38301 18.0633 4.50433L17.0911 3.53206ZM14.9697 4.59272C15.2626 4.29982 15.7375 4.29982 16.0304 4.59272L17.0027 5.56499C17.2956 5.85788 17.2956 6.33276 17.0027 6.62565L16.1043 7.52402L14.0714 5.49109L14.9697 4.59272ZM13.0107 6.55175L6.66806 12.8944C6.56526 12.9972 6.49455 13.1277 6.46454 13.2699L5.96704 15.6283L8.32547 15.1308C8.46772 15.1008 8.59819 15.0301 8.70099 14.9273L15.0436 8.58468L13.0107 6.55175Z" fill="currentColor" />
+    </svg>
+);
+
+const TrashBinIcon = ({ className = "" }: { className?: string }) => (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+        <path fillRule="evenodd" clipRule="evenodd" d="M6.54142 3.7915C6.54142 2.54886 7.54878 1.5415 8.79142 1.5415H11.2081C12.4507 1.5415 13.4581 2.54886 13.4581 3.7915V4.0415H15.6252H16.666C17.0802 4.0415 17.416 4.37729 17.416 4.7915C17.416 5.20572 17.0802 5.5415 16.666 5.5415H16.3752V8.24638V13.2464V16.2082C16.3752 17.4508 15.3678 18.4582 14.1252 18.4582H5.87516C4.63252 18.4582 3.62516 17.4508 3.62516 16.2082V13.2464V8.24638V5.5415H3.3335C2.91928 5.5415 2.5835 5.20572 2.5835 4.7915C2.5835 4.37729 2.91928 4.0415 3.3335 4.0415H4.37516H6.54142V3.7915ZM14.8752 13.2464V8.24638V5.5415H13.4581H12.7081H7.29142H6.54142H5.12516V8.24638V13.2464V16.2082C5.12516 16.6224 5.46095 16.9582 5.87516 16.9582H14.1252C14.5394 16.9582 14.8752 16.6224 14.8752 16.2082V13.2464ZM8.04142 4.0415H11.9581V3.7915C11.9581 3.37729 11.6223 3.0415 11.2081 3.0415H8.79142C8.37721 3.0415 8.04142 3.37729 8.04142 3.7915V4.0415ZM8.3335 7.99984C8.74771 7.99984 9.0835 8.33562 9.0835 8.74984V13.7498C9.0835 14.1641 8.74771 14.4998 8.3335 14.4998C7.91928 14.4998 7.5835 14.1641 7.5835 13.7498V8.74984C7.5835 8.33562 7.91928 7.99984 8.3335 7.99984ZM12.4168 8.74984C12.4168 8.33562 12.081 7.99984 11.6668 7.99984C11.2526 7.99984 10.9168 8.33562 10.9168 8.74984V13.7498C10.9168 14.1641 11.2526 14.4998 11.6668 14.4998C12.081 14.4998 12.4168 14.1641 12.4168 13.7498V8.74984Z" fill="currentColor" />
+    </svg>
+);
+
+const LockIcon = ({ className = "" }: { className?: string }) => (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+        <path d="M10.6252 13.9582C10.6252 13.613 10.3453 13.3332 10.0002 13.3332C9.65498 13.3332 9.37516 13.613 9.37516 13.9582V15.2082C9.37516 15.5533 9.65498 15.8332 10.0002 15.8332C10.3453 15.8332 10.6252 15.5533 10.6252 15.2082V13.9582Z" fill="#667085" />
+        <path fillRule="evenodd" clipRule="evenodd" d="M10.0002 1.6665C7.58392 1.6665 5.62516 3.62526 5.62516 6.0415V7.604H4.5835C3.54796 7.604 2.7085 8.44347 2.7085 9.479V16.4578C2.7085 17.4933 3.54796 18.3328 4.5835 18.3328H15.4168C16.4524 18.3328 17.2918 17.4933 17.2918 16.4578V9.479C17.2918 8.44347 16.4524 7.604 15.4168 7.604H14.3752V6.0415C14.3752 3.62526 12.4164 1.6665 10.0002 1.6665ZM13.1252 6.0415V7.604H6.87516V6.0415C6.87516 4.31561 8.27427 2.9165 10.0002 2.9165C11.7261 2.9165 13.1252 4.31561 13.1252 6.0415ZM4.5835 8.854C4.23832 8.854 3.9585 9.13383 3.9585 9.479V16.4578C3.9585 16.8029 4.23832 17.0828 4.5835 17.0828H15.4168C15.762 17.0828 16.0418 16.8029 16.0418 16.4578V9.479C16.0418 9.13383 15.762 8.854 15.4168 8.854H4.5835Z" fill="currentColor" />
+    </svg>
+);
+
+const UserIcon = ({ className = "" }: { className?: string }) => (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+        <path fillRule="evenodd" clipRule="evenodd" d="M8.0254 6.17845C8.0254 4.90629 9.05669 3.875 10.3289 3.875C11.601 3.875 12.6323 4.90629 12.6323 6.17845C12.6323 7.45061 11.601 8.48191 10.3289 8.48191C9.05669 8.48191 8.0254 7.45061 8.0254 6.17845ZM10.3289 2.375C8.22827 2.375 6.5254 4.07786 6.5254 6.17845C6.5254 8.27904 8.22827 9.98191 10.3289 9.98191C12.4294 9.98191 14.1323 8.27904 14.1323 6.17845C14.1323 4.07786 12.4294 2.375 10.3289 2.375ZM8.92286 11.03C5.7669 11.03 3.2085 13.5884 3.2085 16.7444V17.0333C3.2085 17.4475 3.54428 17.7833 3.9585 17.7833C4.37271 17.7833 4.7085 17.4475 4.7085 17.0333V16.7444C4.7085 14.4169 6.59533 12.53 8.92286 12.53H11.736C14.0635 12.53 15.9504 14.4169 15.9504 16.7444V17.0333C15.9504 17.4475 16.2861 17.7833 16.7004 17.7833C17.1146 17.7833 17.4504 17.4475 17.4504 17.0333V16.7444C17.4504 13.5884 14.8919 11.03 11.736 11.03H8.92286Z" fill="currentColor" />
+    </svg>
+);
+
+const CheckCircleIcon = ({ className = "" }: { className?: string }) => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+        <path fillRule="evenodd" clipRule="evenodd" d="M3.55078 12C3.55078 7.33417 7.3332 3.55176 11.999 3.55176C16.6649 3.55176 20.4473 7.33417 20.4473 12C20.4473 16.6659 16.6649 20.4483 11.999 20.4483C7.3332 20.4483 3.55078 16.6659 3.55078 12ZM11.999 2.05176C6.50477 2.05176 2.05078 6.50574 2.05078 12C2.05078 17.4943 6.50477 21.9483 11.999 21.9483C17.4933 21.9483 21.9473 17.4943 21.9473 12C21.9473 6.50574 17.4933 2.05176 11.999 2.05176ZM15.5126 10.6333C15.8055 10.3405 15.8055 9.86558 15.5126 9.57269C15.2197 9.27979 14.7448 9.27979 14.4519 9.57269L11.1883 12.8364L9.54616 11.1942C9.25327 10.9014 8.7784 10.9014 8.4855 11.1942C8.19261 11.4871 8.19261 11.962 8.4855 12.2549L10.6579 14.4273C10.7986 14.568 10.9894 14.647 11.1883 14.647C11.3872 14.647 11.578 14.568 11.7186 14.4273L15.5126 10.6333Z" fill="currentColor" />
+    </svg>
+);
+
+const CloseIcon = ({ className = "" }: { className?: string }) => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+        <path fillRule="evenodd" clipRule="evenodd" d="M6.04289 16.5418C5.65237 16.9323 5.65237 17.5655 6.04289 17.956C6.43342 18.3465 7.06658 18.3465 7.45711 17.956L11.9987 13.4144L16.5408 17.9565C16.9313 18.347 17.5645 18.347 17.955 17.9565C18.3455 17.566 18.3455 16.9328 17.955 16.5423L13.4129 12.0002L17.955 7.45808C18.3455 7.06756 18.3455 6.43439 17.955 6.04387C17.5645 5.65335 16.9313 5.65335 16.5408 6.04387L11.9987 10.586L7.45711 6.04439C7.06658 5.65386 6.43342 5.65386 6.04289 6.04439C5.65237 6.43491 5.65237 7.06808 6.04289 7.4586L10.5845 12.0002L6.04289 16.5418Z" fill="currentColor" />
+    </svg>
+);
+
+const BellIcon = ({ className = "" }: { className?: string }) => (
+    <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" className={className}>
+        <path fillRule="evenodd" clipRule="evenodd" d="M10.75 2.29248C10.75 1.87827 10.4143 1.54248 10 1.54248C9.58583 1.54248 9.25004 1.87827 9.25004 2.29248V2.83613C6.08266 3.20733 3.62504 5.9004 3.62504 9.16748V14.4591H3.33337C2.91916 14.4591 2.58337 14.7949 2.58337 15.2091C2.58337 15.6234 2.91916 15.9591 3.33337 15.9591H4.37504H15.625H16.6667C17.0809 15.9591 17.4167 15.6234 17.4167 15.2091C17.4167 14.7949 17.0809 14.4591 16.6667 14.4591H16.375V9.16748C16.375 5.9004 13.9174 3.20733 10.75 2.83613V2.29248ZM14.875 14.4591V9.16748C14.875 6.47509 12.6924 4.29248 10 4.29248C7.30765 4.29248 5.12504 6.47509 5.12504 9.16748V14.4591H14.875ZM8.00004 17.7085C8.00004 18.1228 8.33583 18.4585 8.75004 18.4585H11.25C11.6643 18.4585 12 18.1228 12 17.7085C12 17.2943 11.6643 16.9585 11.25 16.9585H8.75004C8.33583 16.9585 8.00004 17.2943 8.00004 17.7085Z" fill="currentColor" />
+    </svg>
+);
+
+const CheckLineIcon = ({ className = "" }: { className?: string }) => (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+        <path d="M13.4017 4.35986L6.12166 11.6399L2.59833 8.11657" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
+
+const ListIcon = ({ className = "" }: { className?: string }) => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+        <path fillRule="evenodd" clipRule="evenodd" d="M5.5 3.25C4.25736 3.25 3.25 4.25736 3.25 5.5V18.5C3.25 19.7426 4.25736 20.75 5.5 20.75H18.5001C19.7427 20.75 20.7501 19.7426 20.7501 18.5V5.5C20.7501 4.25736 19.7427 3.25 18.5001 3.25H5.5ZM4.75 5.5C4.75 5.08579 5.08579 4.75 5.5 4.75H18.5001C18.9143 4.75 19.2501 5.08579 19.2501 5.5V18.5C19.2501 18.9142 18.9143 19.25 18.5001 19.25H5.5C5.08579 19.25 4.75 18.9142 4.75 18.5V5.5ZM6.25005 9.7143C6.25005 9.30008 6.58583 8.9643 7.00005 8.9643L17 8.96429C17.4143 8.96429 17.75 9.30008 17.75 9.71429C17.75 10.1285 17.4143 10.4643 17 10.4643L7.00005 10.4643C6.58583 10.4643 6.25005 10.1285 6.25005 9.7143ZM6.25005 14.2857C6.25005 13.8715 6.58583 13.5357 7.00005 13.5357H17C17.4143 13.5357 17.75 13.8715 17.75 14.2857C17.75 14.6999 17.4143 15.0357 17 15.0357H7.00005C6.58583 15.0357 6.25005 14.6999 6.25005 14.2857Z" fill="currentColor" />
+    </svg>
+);
+
+const AlertIcon = ({ className = "" }: { className?: string }) => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+        <path fillRule="evenodd" clipRule="evenodd" d="M13.9497 3.875C13.0836 2.375 10.9186 2.375 10.0525 3.875L2.54699 16.875C1.68096 18.375 2.76349 20.25 4.49554 20.25H19.5067C21.2387 20.25 22.3212 18.375 21.4552 16.875L13.9497 3.875ZM11.3516 4.625C11.6403 4.125 12.3619 4.125 12.6506 4.625L20.1562 17.625C20.4448 18.125 20.084 18.75 19.5067 18.75H4.49554C3.91819 18.75 3.55735 18.125 3.84603 17.625L11.3516 4.625ZM12.0018 8.56075C12.416 8.56075 12.7518 8.89653 12.7518 9.31075V13.5303C12.7518 13.9445 12.416 14.2803 12.0018 14.2803C11.5876 14.2803 11.2518 13.9445 11.2518 13.5303V9.31075C11.2518 8.89653 11.5876 8.56075 12.0018 8.56075ZM11.0009 16.0803C11.0009 15.528 11.4486 15.0803 12.0009 15.0803H12.0016C12.5539 15.0803 13.0016 15.528 13.0016 16.0803C13.0016 16.6326 12.5539 17.0803 12.0016 17.0803H12.0009C11.4486 17.0803 11.0009 16.6326 11.0009 16.0803Z" fill="currentColor" />
+    </svg>
+);
+
 // Initial form state for adding/editing users
 const initialForm = {
     username: '',
     password: '',
-    oldPassword: '',
     role: 'user', // Default role for new user
     status: UserStatus.ACTIVE, // Default status for new user
     site: getSiteSystem(),
@@ -67,15 +151,17 @@ const TableSkeleton = () => (
                     </div>
                 </TableCell>
                 <TableCell className="px-6 py-4">
-                    <div className="space-y-1">
-                        <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded animate-shimmer w-20"></div>
-                        <div className="h-3 bg-gradient-to-r from-gray-200 to-gray-300 rounded animate-shimmer w-16"></div>
-                    </div>
-                </TableCell>
-                <TableCell className="px-6 py-4">
-                    <div className="space-y-1">
-                        <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded animate-shimmer w-20"></div>
-                        <div className="h-3 bg-gradient-to-r from-gray-200 to-gray-300 rounded animate-shimmer w-16"></div>
+                    <div className="space-y-3">
+                        <div className="space-y-1">
+                            <div className="h-3 bg-gradient-to-r from-gray-200 to-gray-300 rounded animate-shimmer w-16"></div>
+                            <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded animate-shimmer w-20"></div>
+                        </div>
+                        <div className="border-t border-gray-200 pt-2">
+                            <div className="space-y-1">
+                                <div className="h-3 bg-gradient-to-r from-gray-200 to-gray-300 rounded animate-shimmer w-16"></div>
+                                <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded animate-shimmer w-20"></div>
+                            </div>
+                        </div>
                     </div>
                 </TableCell>
                 <TableCell className="px-6 py-4">
@@ -139,22 +225,17 @@ const ActionButtons = ({ onChangePassword, onDelete, loading }: {
         <button
             onClick={onChangePassword}
             disabled={loading}
-            className="group inline-flex items-center px-3 py-2 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:border-blue-300 hover:shadow-md transition-all duration-200 transform hover:scale-105 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800 dark:hover:bg-blue-900/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            className="group inline-flex items-center px-3 py-2 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:border-blue-300 hover:shadow-md transition-all duration-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800 dark:hover:bg-blue-900/30 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-            <svg className="w-3.5 h-3.5 mr-1.5 group-hover:rotate-12 transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-2a1 1 0 11-2 0 1 1 0 012 0z" clipRule="evenodd"/>
-            </svg>
-            Đổi MK
+            <PencilIcon className="w-3.5 h-3.5 mr-1.5 group-hover:rotate-12 transition-transform duration-200" />
+            Đặt lại MK
         </button>
         <button
             onClick={onDelete}
             disabled={loading}
-            className="group inline-flex items-center px-3 py-2 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 hover:shadow-md transition-all duration-200 transform hover:scale-105 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            className="group inline-flex items-center px-3 py-2 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 hover:shadow-md transition-all duration-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/30 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-            <svg className="w-3.5 h-3.5 mr-1.5 group-hover:rotate-12 transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clipRule="evenodd"/>
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
-            </svg>
+            <TrashBinIcon className="w-3.5 h-3.5 mr-1.5 group-hover:rotate-12 transition-transform duration-200" />
             Xóa
         </button>
     </div>
@@ -254,8 +335,8 @@ export default function UserTable() {
                     setError(res.message || 'Tạo người dùng thất bại.');
                 }
             } else if (modalType?.trim() === "changePass") {
-                const { oldPassword, password } = form;
-                res = await userServices.changePasswordUser({ oldPassword, password }, editUserId);
+                const { password } = form;
+                res = await userServices.changePasswordUser({ password }, editUserId);
                 if (res.success) {
                     toast.success("Đổi mật khẩu thành công!");
                     closeModal();
@@ -397,9 +478,7 @@ export default function UserTable() {
                         <div className="space-y-2">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg">
-                                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
-                                    </svg>
+                                    <UserCircleIcon className="w-6 h-6 text-white" />
                                 </div>
                                 <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent dark:from-white dark:to-gray-300">
                                     Quản lý người dùng
@@ -419,11 +498,9 @@ export default function UserTable() {
                         <button
                             onClick={() => openModal("add")}
                             type="button"
-                            className="group inline-flex items-center px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 via-blue-700 to-purple-700 border border-transparent rounded-xl shadow-lg hover:shadow-xl hover:shadow-blue-500/25 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 transform hover:scale-105 hover:-translate-y-0.5"
+                            className="group inline-flex items-center px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 via-blue-700 to-purple-700 border border-transparent rounded-xl shadow-lg hover:shadow-xl hover:shadow-blue-500/25 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
                         >
-                            <svg className="w-5 h-5 mr-2 group-hover:rotate-180 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 5C10.5523 5 11 5.44772 11 6V9H14C14.5523 9 15 9.44772 15 10C15 10.5523 14.5523 11 14 11H11V14C11 14.5523 10.5523 15 10 15C9.44772 15 9 14.5523 9 14V11H6C5.44772 11 5 10.5523 5 10C5 9.44772 5.44772 9 6 9H9V6C9 5.44772 9.44772 5 10 5Z" clipRule="evenodd"/>
-                            </svg>
+                            <PlusIcon className="w-5 h-5 mr-2 group-hover:rotate-180 transition-transform duration-300" />
                             Thêm người dùng mới
                             <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-white/20 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         </button>
@@ -431,47 +508,60 @@ export default function UserTable() {
                 </div>
 
                 {/* Enhanced Filters and Search */}
+                {/* 
+                    Giao diện bộ lọc được làm đều các input, các trường input/select có cùng chiều cao, padding, border, font, và layout nhất quán.
+                    Sử dụng grid chia đều các cột, nút bấm căn giữa hàng cuối cùng.
+                */}
                 <div className="p-8 border-b border-gray-200/60 bg-gradient-to-r from-gray-50/30 to-transparent dark:border-white/[0.08] dark:from-gray-800/20">
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
-                        <div className="xl:col-span-2">
-                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        {/* Ô tìm kiếm */}
+                        <div className="flex flex-col justify-end">
+                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                 <span className="flex items-center gap-2">
-                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd"/>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4">
+                                        <path
+                                            fillRule="evenodd"
+                                            clipRule="evenodd"
+                                            d="M5.5 3.25C4.25736 3.25 3.25 4.25736 3.25 5.5V8.99998C3.25 10.2426 4.25736 11.25 5.5 11.25H9C10.2426 11.25 11.25 10.2426 11.25 8.99998V5.5C11.25 4.25736 10.2426 3.25 9 3.25H5.5ZM4.75 5.5C4.75 5.08579 5.08579 4.75 5.5 4.75H9C9.41421 4.75 9.75 5.08579 9.75 5.5V8.99998C9.75 9.41419 9.41421 9.74998 9 9.74998H5.5C5.08579 9.74998 4.75 9.41419 4.75 8.99998V5.5ZM5.5 12.75C4.25736 12.75 3.25 13.7574 3.25 15V18.5C3.25 19.7426 4.25736 20.75 5.5 20.75H9C10.2426 20.75 11.25 19.7427 11.25 18.5V15C11.25 13.7574 10.2426 12.75 9 12.75H5.5ZM4.75 15C4.75 14.5858 5.08579 14.25 5.5 14.25H9C9.41421 14.25 9.75 14.5858 9.75 15V18.5C9.75 18.9142 9.41421 19.25 9 19.25H5.5C5.08579 19.25 4.75 18.9142 4.75 18.5V15ZM12.75 5.5C12.75 4.25736 13.7574 3.25 15 3.25H18.5C19.7426 3.25 20.75 4.25736 20.75 5.5V8.99998C20.75 10.2426 19.7426 11.25 18.5 11.25H15C13.7574 11.25 12.75 10.2426 12.75 8.99998V5.5ZM15 4.75C14.5858 4.75 14.25 5.08579 14.25 5.5V8.99998C14.25 9.41419 14.5858 9.74998 15 9.74998H18.5C18.9142 9.74998 19.25 9.41419 19.25 8.99998V5.5C19.25 5.08579 18.9142 4.75 18.5 4.75H15ZM15 12.75C13.7574 12.75 12.75 13.7574 12.75 15V18.5C12.75 19.7426 13.7574 20.75 15 20.75H18.5C19.7426 20.75 20.75 19.7427 20.75 18.5V15C20.75 13.7574 19.7426 12.75 18.5 12.75H15ZM14.25 15C14.25 14.5858 14.5858 14.25 15 14.25H18.5C18.9142 14.25 19.25 14.5858 19.25 15V18.5C19.25 18.9142 18.9142 19.25 18.5 19.25H15C14.5858 19.25 14.25 18.9142 14.25 18.5V15Z"
+                                            fill="currentColor"
+                                        />
                                     </svg>
                                     Tìm kiếm
                                 </span>
                             </label>
-                            <div className="relative group">
+                            <div className="relative">
                                 <input
                                     type="text"
                                     placeholder="Nhập tên tài khoản để tìm kiếm..."
                                     value={usernameInput}
                                     onChange={(e) => setUsernameInput(e.target.value)}
                                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                                    className="w-full pl-12 pr-4 py-3.5 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/80 backdrop-blur-sm hover:border-gray-300 dark:bg-gray-800/80 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-400"
+                                    className="w-full pl-11 pr-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-400 transition-all duration-200"
                                 />
-                                <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                                    <svg className="w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors duration-200" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd"/>
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-gray-400">
+                                        <path
+                                            fillRule="evenodd"
+                                            clipRule="evenodd"
+                                            d="M5.5 3.25C4.25736 3.25 3.25 4.25736 3.25 5.5V8.99998C3.25 10.2426 4.25736 11.25 5.5 11.25H9C10.2426 11.25 11.25 10.2426 11.25 8.99998V5.5C11.25 4.25736 10.2426 3.25 9 3.25H5.5ZM4.75 5.5C4.75 5.08579 5.08579 4.75 5.5 4.75H9C9.41421 4.75 9.75 5.08579 9.75 5.5V8.99998C9.75 9.41419 9.41421 9.74998 9 9.74998H5.5C5.08579 9.74998 4.75 9.41419 4.75 8.99998V5.5ZM5.5 12.75C4.25736 12.75 3.25 13.7574 3.25 15V18.5C3.25 19.7426 4.25736 20.75 5.5 20.75H9C10.2426 20.75 11.25 19.7427 11.25 18.5V15C11.25 13.7574 10.2426 12.75 9 12.75H5.5ZM4.75 15C4.75 14.5858 5.08579 14.25 5.5 14.25H9C9.41421 14.25 9.75 14.5858 9.75 15V18.5C9.75 18.9142 9.41421 19.25 9 19.25H5.5C5.08579 19.25 4.75 18.9142 4.75 18.5V15ZM12.75 5.5C12.75 4.25736 13.7574 3.25 15 3.25H18.5C19.7426 3.25 20.75 4.25736 20.75 5.5V8.99998C20.75 10.2426 19.7426 11.25 18.5 11.25H15C13.7574 11.25 12.75 10.2426 12.75 8.99998V5.5ZM15 4.75C14.5858 4.75 14.25 5.08579 14.25 5.5V8.99998C14.25 9.41419 14.5858 9.74998 15 9.74998H18.5C18.9142 9.74998 19.25 9.41419 19.25 8.99998V5.5C19.25 5.08579 18.9142 4.75 18.5 4.75H15ZM15 12.75C13.7574 12.75 12.75 13.7574 12.75 15V18.5C12.75 19.7426 13.7574 20.75 15 20.75H18.5C19.7426 20.75 20.75 19.7427 20.75 18.5V15C20.75 13.7574 19.7426 12.75 18.5 12.75H15ZM14.25 15C14.25 14.5858 14.5858 14.25 15 14.25H18.5C18.9142 14.25 19.25 14.5858 19.25 15V18.5C19.25 18.9142 18.9142 19.25 18.5 19.25H15C14.5858 19.25 14.25 18.9142 14.25 18.5V15Z"
+                                            fill="currentColor"
+                                        />
                                     </svg>
                                 </div>
                             </div>
                         </div>
-                        
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        {/* Ô chọn vai trò */}
+                        <div className="flex flex-col justify-end">
+                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                 <span className="flex items-center gap-2">
-                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
+                                    <CheckCircleIcon className="w-4 h-4" />
                                     Vai trò
                                 </span>
                             </label>
                             <select
                                 value={filters.role}
                                 onChange={(e) => setFilters({ ...filters, role: e.target.value, page: 1 })}
-                                className="w-full px-4 py-3.5 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/80 backdrop-blur-sm hover:border-gray-300 dark:bg-gray-800/80 dark:border-gray-600 dark:text-white"
+                                className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white transition-all duration-200"
                             >
                                 <option value="">Tất cả vai trò</option>
                                 {Object.entries(information.role).map(([key, label]) => (
@@ -479,41 +569,42 @@ export default function UserTable() {
                                 ))}
                             </select>
                         </div>
-                        
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        {/* Ô chọn trạng thái */}
+                        <div className="flex flex-col justify-end">
+                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                 <span className="flex items-center gap-2">
-                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-                                    </svg>
+                                    <BellIcon className="w-4 h-4" />
                                     Trạng thái
                                 </span>
                             </label>
                             <select
                                 value={filters.status}
                                 onChange={(e) => setFilters({ ...filters, status: e.target.value, page: 1 })}
-                                className="w-full px-4 py-3.5 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/80 backdrop-blur-sm hover:border-gray-300 dark:bg-gray-800/80 dark:border-gray-600 dark:text-white"
+                                className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white transition-all duration-200"
                             >
                                 <option value="">Tất cả trạng thái</option>
                                 <option value={UserStatus.ACTIVE}>{getStatusLabel(UserStatus.ACTIVE)}</option>
                                 <option value={UserStatus.INACTIVE}>{getStatusLabel(UserStatus.INACTIVE)}</option>
                             </select>
                         </div>
-                        
+                        {/* Cột nút bấm */}
                         <div className="flex items-end gap-3">
                             <button
                                 onClick={handleSearch}
-                                className="px-6 py-3.5 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 border border-transparent rounded-xl hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                                className="w-full px-4 py-3 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 border border-transparent rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-lg hover:shadow-xl"
                             >
                                 Tìm kiếm
                             </button>
                             <button
                                 onClick={clearFilters}
-                                className="px-6 py-3.5 text-sm font-semibold text-gray-700 bg-white border-2 border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+                                className="w-full px-4 py-3 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200 shadow-lg hover:shadow-xl dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
                             >
                                 Xóa bộ lọc
                             </button>
                         </div>
+                        {/* Nếu muốn thêm cột trống để căn đều, có thể thêm div ẩn ở đây */}
+                        <div className="hidden xl:block"></div>
+                        <div className="hidden xl:block"></div>
                     </div>
                 </div>
 
@@ -525,11 +616,10 @@ export default function UserTable() {
                                 <TableRow>
                                     {[
                                         { key: "stt", label: "STT", width: "w-20" },
-                                        { key: "username", label: "Thông tin tài khoản", width: "min-w-48" },
+                                        { key: "username", label: "Thông tin tài khoản", width: "min-w-48 text-left" },
                                         { key: "role", label: "Vai trò", width: "min-w-32" },
                                         { key: "status", label: "Trạng thái", width: "min-w-36" },
-                                        { key: "created", label: "Ngày tạo", width: "min-w-32" },
-                                        { key: "updated", label: "Cập nhật", width: "min-w-32" },
+                                        { key: "datetime", label: "Ngày tạo / Cập nhật", width: "min-w-40" },
                                         { key: "actions", label: "Thao tác", width: "min-w-40" }
                                     ].map((header) => (
                                         <TableCell
@@ -561,14 +651,7 @@ export default function UserTable() {
                                             </TableCell>
                                             
                                             <TableCell className="px-8 py-6">
-                                                <div className="flex items-center space-x-4">
-                                                    <div className="flex-shrink-0">
-                                                        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
-                                                            <span className="text-white font-bold text-lg">
-                                                                {user.username.charAt(0).toUpperCase()}
-                                                            </span>
-                                                        </div>
-                                                    </div>
+                                                <div className="flex items-center justify-start">
                                                     <div className="space-y-1">
                                                         <div className="text-sm font-semibold text-gray-900 dark:text-white">
                                                             {user.username}
@@ -599,43 +682,37 @@ export default function UserTable() {
                                             </TableCell>
                                             
                                             <TableCell className="px-8 py-6">
-                                                <div className="flex justify-center items-center gap-3">
-                                                    <Switch
-                                                        label={getStatusLabel(user.status)}
-                                                        checked={isActiveStatus(user.status)}
-                                                        disabled={updateLoading === user._id}
-                                                        onChange={(checked) => handleStatusChange(user._id, checked ? UserStatus.ACTIVE : UserStatus.INACTIVE)}
-                                                        color="blue"
-                                                    />
-                                                    {updateLoading === user._id && (
-                                                        <div className="flex items-center">
-                                                            <svg className="animate-spin h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24">
-                                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                                <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 0 1 4 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                            </svg>
+                                                <div className="flex justify-center items-center">
+                                                    <div className="relative">
+                                                        <Switch
+                                                            label={getStatusLabel(user.status)}
+                                                            checked={isActiveStatus(user.status)}
+                                                            disabled={updateLoading === user._id}
+                                                            onChange={(checked) => handleStatusChange(user._id, checked ? UserStatus.ACTIVE : UserStatus.INACTIVE)}
+                                                            color="blue"
+                                                        />
+                                                        {updateLoading === user._id && (
+                                                            <div className="absolute inset-0 flex items-center justify-center bg-white/70 dark:bg-gray-900/70 backdrop-blur-sm rounded-lg">
+                                                                <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            
+                                            <TableCell className="px-8 py-6 text-sm text-gray-600 dark:text-gray-300">
+                                                <div className="space-y-3">
+                                                    <div className="space-y-1">
+                                                        <div className="text-sm font-medium text-center">
+                                                            {formatDateTimeVN(user.createdAt)}
                                                         </div>
-                                                    )}
-                                                </div>
-                                            </TableCell>
-                                            
-                                            <TableCell className="px-8 py-6 text-sm text-gray-600 dark:text-gray-300">
-                                                <div className="space-y-1">
-                                                    <div className="text-sm font-medium">
-                                                        {formatDateTimeVN(user.createdAt)}
                                                     </div>
-                                                    <div className="text-xs text-gray-400">
-                                                        {new Date(user.createdAt).toLocaleDateString('vi-VN')}
-                                                    </div>
-                                                </div>
-                                            </TableCell>
-                                            
-                                            <TableCell className="px-8 py-6 text-sm text-gray-600 dark:text-gray-300">
-                                                <div className="space-y-1">
-                                                    <div className="text-sm font-medium">
-                                                        {formatDateTimeVN(user.updatedAt)}
-                                                    </div>
-                                                    <div className="text-xs text-gray-400">
-                                                        {new Date(user.updatedAt).toLocaleDateString('vi-VN')}
+                                                    <div className="border-t border-gray-200/60 dark:border-white/[0.05] pt-2">
+                                                        <div className="space-y-1">
+                                                            <div className="text-sm font-medium  text-center">
+                                                                {formatDateTimeVN(user.updatedAt)}
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </TableCell>
@@ -654,12 +731,10 @@ export default function UserTable() {
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={7} className="px-8 py-20 text-center">
+                                        <TableCell colSpan={6} className="px-8 py-20 text-center">
                                             <div className="flex flex-col items-center justify-center space-y-6">
                                                 <div className="w-24 h-24 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center dark:from-gray-800 dark:to-gray-700">
-                                                    <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
-                                                    </svg>
+                                                    <UserCircleIcon className="w-12 h-12 text-gray-400" />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -669,12 +744,12 @@ export default function UserTable() {
                                                         Không có người dùng nào phù hợp với tiêu chí tìm kiếm. Hãy thử thay đổi bộ lọc hoặc tạo người dùng mới.
                                                     </p>
                                                 </div>
-                                                <button
-                                                    onClick={() => openModal("add")}
-                                                    className="px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105"
-                                                >
-                                                    Tạo người dùng đầu tiên
-                                                </button>
+                                                                                <button
+                                    onClick={() => openModal("add")}
+                                    className="px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
+                                >
+                                    Tạo người dùng đầu tiên
+                                </button>
                                             </div>
                                         </TableCell>
                                     </TableRow>
@@ -727,25 +802,21 @@ export default function UserTable() {
                     <div className="flex items-center justify-between p-8 border-b border-gray-200/60 dark:border-gray-700 bg-gradient-to-r from-gray-50/50 to-transparent dark:from-gray-800/30">
                         <div className="flex items-center gap-4">
                             <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg">
-                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    {modalType === "add" ? (
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                    ) : (
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m0 0a2 2 0 01-2 2m2-2h.01M9 5a2 2 0 00-2 2v.01M9 5a2 2 0 012-2 2 2 0 012 2m-2 4a2 2 0 00-2 2v.01m2-4.01V9a2 2 0 012-2 2 2 0 012 2v.01M9 9.01V9a2 2 0 012-2 2 2 0 012 2v.01" />
-                                    )}
-                                </svg>
+                                {modalType === "add" ? (
+                                    <PlusIcon className="w-6 h-6 text-white" />
+                                ) : (
+                                    <LockIcon className="w-6 h-6 text-white" />
+                                )}
                             </div>
                             <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                                {modalType === "add" ? "Tạo người dùng mới" : "Đổi mật khẩu"}
+                                {modalType === "add" ? "Tạo người dùng mới" : "Đặt lại mật khẩu"}
                             </h3>
                         </div>
                         <button
                             onClick={handleCloseModal}
                             className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
                         >
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                            <CloseIcon className="w-6 h-6" />
                         </button>
                     </div>
 
@@ -756,9 +827,7 @@ export default function UserTable() {
                                 <>
                                     <div className="space-y-3">
                                         <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"/>
-                                            </svg>
+                                            <UserIcon className="w-4 h-4" />
                                             Tên tài khoản
                                         </Label>
                                         <Input
@@ -774,9 +843,7 @@ export default function UserTable() {
 
                                     <div className="space-y-3">
                                         <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
+                                            <CheckCircleIcon className="w-4 h-4" />
                                             Vai trò
                                         </Label>
                                         <select
@@ -795,31 +862,11 @@ export default function UserTable() {
                                 </>
                             )}
 
-                            {modalType === "changePass" && (
-                                <div className="space-y-3">
-                                    <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/>
-                                        </svg>
-                                        Mật khẩu cũ
-                                    </Label>
-                                    <Input
-                                        type="password"
-                                        placeholder="Nhập mật khẩu hiện tại"
-                                        value={form.oldPassword}
-                                        name="oldPassword"
-                                        onChange={handleChange}
-                                        required
-                                        className="w-full px-4 py-3.5 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                    />
-                                </div>
-                            )}
+
 
                             <div className="space-y-3">
                                 <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/>
-                                    </svg>
+                                    <LockIcon className="w-4 h-4" />
                                     {modalType === "add" ? "Mật khẩu" : "Mật khẩu mới"}
                                 </Label>
                                 <div className="relative">
@@ -849,9 +896,7 @@ export default function UserTable() {
                             {error && (
                                 <div className="bg-gradient-to-r from-red-50 to-red-100/50 border-2 border-red-200 rounded-xl p-4 shadow-lg dark:from-red-900/20 dark:to-red-800/10 dark:border-red-800">
                                     <div className="flex items-center gap-3">
-                                        <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
-                                        </svg>
+                                        <AlertIcon className="w-5 h-5 text-red-500" />
                                         <p className="text-sm font-medium text-red-800 dark:text-red-400">{error}</p>
                                     </div>
                                 </div>
@@ -864,25 +909,22 @@ export default function UserTable() {
                                 type="button"
                                 variant="outline" 
                                 onClick={handleCloseModal}
-                                className="px-6 py-3 text-sm font-semibold border-2 rounded-xl transition-all duration-200 hover:scale-105"
+                                className="px-6 py-3 text-sm font-semibold border-2 rounded-xl transition-all duration-200"
                             >
                                 Hủy bỏ
                             </Button>
                             <Button 
                                 type="submit" 
                                 disabled={loading}
-                                className="px-8 py-3 text-sm font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                                className="px-8 py-3 text-sm font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {loading ? (
                                     <div className="flex items-center">
-                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 0 1 4 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
+                                        <div className="animate-spin -ml-1 mr-3 h-5 w-5 text-white border-2 border-white border-t-transparent rounded-full"></div>
                                         Đang xử lý...
                                     </div>
                                 ) : (
-                                    modalType === "add" ? "Tạo người dùng" : "Cập nhật mật khẩu"
+                                    modalType === "add" ? "Tạo người dùng" : "Đặt lại mật khẩu"
                                 )}
                             </Button>
                         </div>
